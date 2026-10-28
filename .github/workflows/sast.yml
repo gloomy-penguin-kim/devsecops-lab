@@ -1,0 +1,19 @@
+name: SAST Scan 
+
+on: [push, pull_request]
+
+permissions:
+  contents: read
+
+jobs:
+  semgrep:
+    runs-on: ubuntu-latest
+
+    container:
+      image: semgrep/semgrep
+
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+
+      - name: Run Semgrep
+        run: semgrep scan --config auto --config .semgrep/custom-rules.yml  --error .
