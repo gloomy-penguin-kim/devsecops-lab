@@ -11,18 +11,39 @@ jobs:
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
 
-      - name: Install Trivy
-        run: |
-          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+      # - name: Install Trivy
+      #   run: |
+      #     curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
 
+      # - name: Generate SBOM
+      #   run: trivy fs --format cyclonedx --output sbom.json .
+
+      # - name: Upload SBOM artifact
+      #   uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+      #   with:
+      #     name: sbom
+      #     path: sbom.json
+
+      # - name: Scan for critical vulnerabilities
+      #   run: trivy fs --severity CRITICAL --exit-code 1 .  
       - name: Generate SBOM
-        run: trivy fs --format cyclonedx --output sbom.json .
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          format: cyclonedx
+          output: sbom.json
 
       - name: Upload SBOM artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: sbom
           path: sbom.json
-
+          
       - name: Scan for critical vulnerabilities
-        run: trivy fs --severity CRITICAL --exit-code 1 .  
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: fs
+          scan-ref: .
+          severity: CRITICAL
+          exit-code: '1'
